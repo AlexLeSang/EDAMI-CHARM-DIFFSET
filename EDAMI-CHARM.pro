@@ -18,12 +18,21 @@ QMAKE_CXXFLAGS += -std=c++11
 
 SOURCES += main.cpp \
     Tree.cpp \
-    Node.cpp
+    Node.cpp \
+    Charm.cpp
 
 HEADERS += \
     Tree.hpp \
     Typedefs.hpp \
-    Node.hpp
+    Node.hpp \
+    Charm.hpp \
+    CSet.hpp \
+    ResultSaver.hpp \
+    DatabaseReader.hpp \
+    Item.hpp \
+    Itemset.hpp \
+    Tidset.hpp \
+    Database.hpp
 
 
 #DEFINES += "TREE_TEST"

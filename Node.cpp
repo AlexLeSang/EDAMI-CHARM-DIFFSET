@@ -1,5 +1,7 @@
 #include "Node.hpp"
 
+#include <cassert>
+
 Node::Node() :
     _itemset( Itemset() ),
     _tidset( Tidset() )
@@ -39,6 +41,16 @@ Node &Node::operator =(const Node &r_node)
         _children = r_node.children();
     }
     return *this;
+}
+
+bool Node::is_erased() const
+{
+    return _is_erased;
+}
+
+void Node::set_erased()
+{
+    _is_erased = true;
 }
 
 void Node::add_child(const Node &node_ref)

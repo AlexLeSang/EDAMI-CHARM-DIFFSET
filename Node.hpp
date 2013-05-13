@@ -1,7 +1,8 @@
 #ifndef NODE_HPP
 #define NODE_HPP
 
-#include "Typedefs.hpp"
+#include "Itemset.hpp"
+#include "Tidset.hpp"
 
 #include <memory>
 
@@ -26,9 +27,14 @@ public:
     Node( const Node & r_node );
     Node & operator = ( const Node & r_node );
 
+    bool is_erased() const;
+    void set_erased();
+
 private:
     Itemset _itemset;
     Tidset _tidset;
+
+    bool _is_erased;
 
     Node * _parent;
     std::vector < std::shared_ptr < Node > > _children;

@@ -14,7 +14,6 @@ void Tree::add(const Itemset &itemset, const Tidset &tidset)
     _root_node->add_child( node );
 }
 
-
 std::weak_ptr<Node> Tree::root_node()
 {
     return std::weak_ptr< Node > ( _root_node );
@@ -37,17 +36,15 @@ void Tree::print_tree() const
 void Tree::remove_node(Node& node_ref, const Itemset &itemset)
 {
     bool found = false;
-    auto it = node_ref.children_ref().begin();
-    for ( ; it != node_ref.children_ref().end(); ++ it ) {
+    for ( auto it = node_ref.children_ref().begin(); it != node_ref.children_ref().end(); ++ it ) {
         auto & child = (*(*it));
         if ( itemset == child.itemset() ) {
             found = true;
+            child.set_erased();
+            break;
         }
     }
-    if ( found ) {
-        node_ref.children_ref().erase( it );
-    }
-    else {
+    if ( ! found ) {
         std::for_each( node_ref.children_ref().begin(), node_ref.children_ref().end(), [&]( std::shared_ptr<Node> & shared_node ) {
             Node & child_ref = (*shared_node);
             remove_node( child_ref, itemset );
