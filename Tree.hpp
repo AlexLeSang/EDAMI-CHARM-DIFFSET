@@ -8,17 +8,16 @@
 
 #include "Node.hpp"
 
+/*!
+ * \brief The Tree class
+ */
 class Tree
 {
 public:
     Tree();
-
     void add( const Itemset &itemset, const Tidset & tidset );
-
     std::weak_ptr < Node > root_node();
-
     void print_tree() const;
-
     void remove( const Itemset & itemset );
     void replace( const Itemset & itemset, const Itemset & itemset_to );
 

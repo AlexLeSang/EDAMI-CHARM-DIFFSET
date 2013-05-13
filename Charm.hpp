@@ -6,6 +6,9 @@
 
 #include "Database.hpp"
 
+/*!
+ * \brief The Charm class
+ */
 class Charm
 {
 public:
@@ -15,7 +18,7 @@ private:
     static void charm_extend(Tree & p_tree, CSet &c_set , const unsigned int min_sup);
     static void charm_property(Tree & p_i_tree, Tree & p_tree, Node & test_node, Node & Xi, Node & Xj, const unsigned int min_sup);
     static bool is_subsumed(const CSet &c_set, const Itemset & X, const Tidset & Y);
-    static void itemset_union(Itemset & X, Node & Xi, Node & Xj);
+    static void itemset_union(Itemset & X, Node & Xj);
     static void tidset_intersection(Node& Xj, Tidset & Y);
     static void property_1(Tree & p_i_tree, Tree & p_tree, Node & Xj, Node & Xi, Node & test_node);
     static void property_2(Tree & p_tree, Tree & p_i_tree, Node & test_node, Node & Xi);

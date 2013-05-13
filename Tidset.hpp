@@ -4,17 +4,38 @@
 #include <vector>
 #include <istream>
 
-typedef unsigned int TID; // Transaction Id
+/*!
+ * \brief TID
+ */
+typedef int TID; // Transaction Id
+
+/*!
+ * \brief Tidset
+ */
 typedef std::vector < TID > Tidset;
 
+/*!
+ * \brief The tidset_hash class
+ */
 class tidset_hash {
 public:
+    /*!
+     * \brief operator ()
+     * \param tidset
+     * \return
+     */
     unsigned int operator ()( const Tidset & tidset ) const
     {
         return std::accumulate( tidset.cbegin(), tidset.cend(), 0 );
     }
 };
 
+/*!
+ * \brief operator <<
+ * \param os
+ * \param tidset
+ * \return
+ */
 inline std::ostream & operator << ( std::ostream & os, const Tidset & tidset )
 {
     unsigned index = tidset.size();

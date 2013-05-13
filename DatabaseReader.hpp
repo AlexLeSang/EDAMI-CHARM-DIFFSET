@@ -3,9 +3,28 @@
 
 #include "Typedefs.hpp"
 
+#include "Itemset.hpp"
+#include "Database.hpp"
+
+#include <sstream>
+
+/*!
+ * \brief The DatabaseReader class
+ */
+
+template < unsigned int nfields >
 class DatabaseReader
 {
+private:
+    static constexpr unsigned int number_of_fields = nfields;
+
 public:
+    /*!
+     * \brief operator ()
+     * \param data_stream
+     * \param database
+     */
+    /* Test database
     void operator ()(std::ifstream & data_stream, Database & database) const
     {
         std::string s;
@@ -18,7 +37,37 @@ public:
             }
         }
     }
+    */
 
+    // Chess
+//    /*
+    void operator ()(std::ifstream & data_stream, Database & database) const
+    {
+        std::string s;
+        while ( ! data_stream.eof() ) {
+            std::getline( data_stream, s );
+
+            if ( !s.empty() ) {
+                //            std::cerr << "Read string: \n" << s << std::endl;
+                std::istringstream stringstream( s );
+
+                Itemset itemset( number_of_fields );
+                for ( unsigned int i = 0; i < number_of_fields; ++ i ) {
+                    stringstream >> itemset[ i ];
+                }
+                //            std::cerr << "Itemset: \n" << itemset << std::endl;
+                //            exit( -1 );
+                database.push_back( itemset );
+            }
+        }
+    }
+//    */
+
+    /*!
+     * \brief read_database
+     * \param data_stream
+     * \param database
+     */
     static void read_database(std::ifstream & data_stream, Database & database)
     {
         DatabaseReader reader;

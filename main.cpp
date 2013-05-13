@@ -2,6 +2,7 @@
 #include "CSet.hpp"
 #include "ResultSaver.hpp"
 #include "DatabaseReader.hpp"
+#include "Typedefs.hpp"
 
 #include <stdexcept>
 
@@ -9,7 +10,12 @@
 
 void print_usage();
 
-
+/*!
+ * \brief main
+ * \param argc
+ * \param argv
+ * \return
+ */
 int main( int argc, const char * argv[] )
 {
     if ( argc != 4 ) {
@@ -46,7 +52,7 @@ int main( int argc, const char * argv[] )
         const std::string & database_filename = argv_vector.at( 1 );
         data_stream.open( database_filename );
         if ( data_stream.is_open() ) {
-            DatabaseReader::read_database( data_stream, database );
+            DatabaseReader< n_of_fields >::read_database( data_stream, database );
             std::cerr << "Database was read" << std::endl; // TODO remove debug output
         }
         else {
@@ -54,10 +60,12 @@ int main( int argc, const char * argv[] )
             print_usage();
             return -1;
         }
+        std::cerr << "Database size: " << database.size() << std::endl; // TODO remove debug output
 //        std::cerr << database << std::endl; // TODO remove debug output
     }
 
     const auto c_set = Charm::charm( database, min_sup );
+    std::cerr << "Number of frequent itemsets: " << c_set.size() << std::endl;
     // Save results
     {
         std::ofstream c_set_stream;
@@ -77,7 +85,9 @@ int main( int argc, const char * argv[] )
     return 0;
 }
 
-
+/*!
+ * \brief print_usage
+ */
 void print_usage()
 {
     std::cerr << "Usage: min_sup input.dat output.res" << std::endl;

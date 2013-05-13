@@ -6,6 +6,9 @@
 
 #include <memory>
 
+/*!
+ * \brief The Node class
+ */
 class Node
 {
 public:
@@ -34,12 +37,18 @@ private:
     Itemset _itemset;
     Tidset _tidset;
 
-    bool _is_erased;
-
     Node * _parent;
     std::vector < std::shared_ptr < Node > > _children;
+
+    bool _is_erased;
 };
 
+/*!
+ * \brief operator <<
+ * \param os
+ * \param node
+ * \return
+ */
 inline std::ostream & operator << ( std::ostream & os, const Node & node )
 {
     os << "Node: ";

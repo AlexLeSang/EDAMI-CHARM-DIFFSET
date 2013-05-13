@@ -6,8 +6,17 @@
 #include <vector>
 #include <algorithm>
 
+/*!
+ * \brief Itemset
+ */
 typedef std::vector < Item > Itemset;
 
+/*!
+ * \brief operator <<
+ * \param os
+ * \param itemset
+ * \return
+ */
 inline std::ostream & operator << ( std::ostream & os, const Itemset & itemset )
 {
     unsigned int index = itemset.size();

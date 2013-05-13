@@ -3,8 +3,14 @@
 
 #include <iostream>
 
-typedef char Item;
+/*!
+ * \brief Item
+ */
+typedef unsigned int Item;
 
+/*!
+ * \brief The item_hash class
+ */
 class item_hash {
 public:
     std::size_t operator()( const Item & item ) const

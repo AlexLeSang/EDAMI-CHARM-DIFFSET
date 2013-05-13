@@ -3,22 +3,38 @@
 #include <functional>
 #include <list>
 
+/*!
+ * \brief Tree::Tree
+ */
 Tree::Tree() : _root_node( new Node() )
 {
 
 }
 
+/*!
+ * \brief Tree::add
+ * \param itemset
+ * \param tidset
+ */
 void Tree::add(const Itemset &itemset, const Tidset &tidset)
 {
     const auto node = Node( itemset, tidset );
     _root_node->add_child( node );
 }
 
+/*!
+ * \brief Tree::root_node
+ * \return
+ */
 std::weak_ptr<Node> Tree::root_node()
 {
     return std::weak_ptr< Node > ( _root_node );
 }
 
+/*!
+ * \brief Tree::print_node
+ * \param node_ptr
+ */
 void Tree::print_node( const std::weak_ptr< Node > & node_ptr )
 {
     const auto node_shared_ptr = node_ptr.lock();
@@ -28,11 +44,19 @@ void Tree::print_node( const std::weak_ptr< Node > & node_ptr )
     } );
 }
 
+/*!
+ * \brief Tree::print_tree
+ */
 void Tree::print_tree() const
 {
     print_node( std::weak_ptr< Node > ( _root_node ) );
 }
 
+/*!
+ * \brief Tree::remove_node
+ * \param node_ref
+ * \param itemset
+ */
 void Tree::remove_node(Node& node_ref, const Itemset &itemset)
 {
     bool found = false;
@@ -52,6 +76,10 @@ void Tree::remove_node(Node& node_ref, const Itemset &itemset)
     }
 }
 
+/*!
+ * \brief Tree::remove
+ * \param itemset
+ */
 void Tree::remove(const Itemset &itemset)
 {
 //    std::cerr << "Remove: " << itemset << std::endl; // TODO remove debug output
@@ -59,7 +87,12 @@ void Tree::remove(const Itemset &itemset)
     remove_node( root_node, itemset );
 }
 
-
+/*!
+ * \brief Tree::replace_item
+ * \param node_ref
+ * \param itemset
+ * \param itemset_to
+ */
 void Tree::replace_item(Node& node_ref, const Itemset &itemset, const Itemset &itemset_to )
 {
     assert( itemset.size() != 0 );
@@ -93,6 +126,11 @@ void Tree::replace_item(Node& node_ref, const Itemset &itemset, const Itemset &i
 
 }
 
+/*!
+ * \brief Tree::replace
+ * \param itemset
+ * \param itemset_to
+ */
 void Tree::replace(const Itemset &itemset, const Itemset &itemset_to)
 {
 //    std::cerr << "Replace: " << itemset << " by: " << itemset_to << std::endl; // TODO remove debug output
