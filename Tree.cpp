@@ -50,38 +50,29 @@ void Tree::print_tree() const
     print_node( std::weak_ptr< Node > ( _root_node ) );
 }
 
-/*!
- * \brief Tree::remove_node
- * \param node_ref
- * \param itemset
- */
-void Tree::remove_node(Node& node_ref, const Itemset &itemset)
-{
-    bool found = false;
-    for ( auto it = node_ref.children_ref().begin(); it != node_ref.children_ref().end(); ++ it ) {
-        auto & child = (*(*it));
-        if ( itemset == child.itemset() ) {
-            found = true;
-            child.set_erased();
-            break;
-        }
-    }
-    if ( ! found ) {
-        std::for_each( node_ref.children_ref().begin(), node_ref.children_ref().end(), [&]( std::shared_ptr<Node> & shared_node ) {
-            remove_node( (*shared_node), itemset );
-        } );
-    }
-}
+//void Tree::remove_node(Node& node_ref, const Itemset &itemset)
+//{
+//    bool found = false;
+//    for ( auto it = node_ref.children_ref().begin(); it != node_ref.children_ref().end(); ++ it ) {
+//        auto & child = (*(*it));
+//        if ( itemset == child.itemset() ) {
+//            found = true;
+//            child.set_erased();
+//            break;
+//        }
+//    }
+//    if ( ! found ) {
+//        std::for_each( node_ref.children_ref().begin(), node_ref.children_ref().end(), [&]( std::shared_ptr<Node> & shared_node ) {
+//            remove_node( (*shared_node), itemset );
+//        } );
+//    }
+//}
 
-/*!
- * \brief Tree::remove
- * \param itemset
- */
-void Tree::remove(const Itemset &itemset)
-{
-    Node & root_node = (*_root_node);
-    remove_node( root_node, itemset );
-}
+//void Tree::remove(const Itemset &itemset)
+//{
+//    Node & root_node = (*_root_node);
+//    remove_node( root_node, itemset );
+//}
 
 /*!
  * \brief Tree::replace_item

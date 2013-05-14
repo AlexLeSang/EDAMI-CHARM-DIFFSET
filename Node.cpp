@@ -60,6 +60,8 @@ Node &Node::operator =(const Node &r_node)
         _itemset = r_node.itemset();
         _tidset = r_node.tidset();
         _children = r_node.children();
+        _parent = r_node.parent();
+        _is_erased = r_node.is_erased();
     }
     return *this;
 }
@@ -88,7 +90,7 @@ void Node::set_erased()
  */
 bool Node::equal(const Node &r_node) const
 {
-    return ( ( sup() == r_node.sup() ) && std::equal( this->tidset().cbegin(), this->tidset().cend(), r_node.tidset().cbegin() ) );
+    return ( ( sup() == r_node.sup() ) && std::equal( _tidset.cbegin(), _tidset.cend(), r_node.tidset().cbegin() ) );
 }
 
 /*!

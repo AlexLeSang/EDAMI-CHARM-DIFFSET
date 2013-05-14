@@ -1,5 +1,7 @@
 #include "Charm.hpp"
 
+typedef std::unordered_map< Item, Tidset, item_hash > ItemMap;
+
 /*!
  * \brief Charm::charm
  * \param database
@@ -11,7 +13,7 @@ CSet Charm::charm(const Database &database, const unsigned int min_sup)
     Tree p;
     // Create a P tree
     {
-        std::unordered_map< Item, Tidset, item_hash > item_map;
+        ItemMap item_map;
         // For each itemset
         TID transaction_counter = 1;
         std::for_each( database.cbegin(), database.cend(), [&] ( const Itemset & itemset ) {
@@ -34,7 +36,7 @@ CSet Charm::charm(const Database &database, const unsigned int min_sup)
         } );
         // Fill the tree
         {
-            std::for_each( item_map.cbegin(), item_map.cend(), [&]( decltype(item_map)::const_reference key_value ) {
+            std::for_each( item_map.cbegin(), item_map.cend(), [&]( ItemMap::const_reference key_value ) {
                 if ( min_sup < key_value.second.size() ) {
                     Itemset itemset;
                     itemset.push_back( key_value.first );
@@ -108,7 +110,7 @@ void Charm::charm_property(Tree &p_i_tree, Tree &p_tree, const Node &test_node, 
             }
             else {
                 if ( Xi.is_superset_of( Xj ) ) {
-                    property_3( p_i_tree, p_tree, Xj, test_node );
+                    property_3( p_i_tree, Xj, test_node );
                 }
                 else {
                     property_4( p_i_tree, test_node );
@@ -205,9 +207,10 @@ void Charm::property_2(Tree &p_tree, Tree &p_i_tree, const Node &test_node, Node
  * \param Xj
  * \param test_node
  */
-void Charm::property_3(Tree &p_i_tree, Tree &p_tree, Node &Xj, const Node &test_node)
+void Charm::property_3(Tree &p_i_tree, Node &Xj, const Node &test_node)
 {
-    p_tree.remove( Xj.itemset() );
+    Xj.set_erased();
+//    p_tree.remove( Xj.itemset() );
     p_i_tree.add( test_node.itemset(), test_node.tidset() );
 }
 

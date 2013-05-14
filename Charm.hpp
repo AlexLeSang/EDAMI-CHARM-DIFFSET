@@ -22,7 +22,7 @@ private:
     static void tidset_intersection(Node& Xj, Tidset & Y);
     static void property_1(Tree & p_i_tree, Tree & p_tree, Node & Xj, Node & Xi, const Node &test_node);
     static void property_2(Tree & p_tree, Tree & p_i_tree, const Node &test_node, Node & Xi);
-    static void property_3(Tree & p_i_tree, Tree & p_tree, Node & Xj, const Node &test_node);
+    static void property_3(Tree & p_i_tree, Node & Xj, const Node &test_node);
     static void property_4(Tree & p_i_tree, const Node &test_node);
     static bool tidset_equal(const Node& Xi, const Node& Xj);
     static bool is_subset(const Node& subset, const Node& superset);

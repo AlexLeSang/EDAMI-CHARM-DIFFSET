@@ -34,5 +34,5 @@ HEADERS += \
     Database.hpp
 
 #DEFINES += "TREE_TEST"
-#DEFINES += "SIMPLE_TEST"
+DEFINES += "SIMPLE_TEST"
 QMAKE_CXX = g++-4.7
