@@ -4,8 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core
-
+QT       -= core
 QT       -= gui
 
 TARGET = EDAMI-CHARM
@@ -34,6 +33,6 @@ HEADERS += \
     Tidset.hpp \
     Database.hpp
 
-
 #DEFINES += "TREE_TEST"
+#DEFINES += "SIMPLE_TEST"
 QMAKE_CXX = g++-4.7

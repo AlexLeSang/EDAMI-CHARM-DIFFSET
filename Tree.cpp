@@ -7,9 +7,7 @@
  * \brief Tree::Tree
  */
 Tree::Tree() : _root_node( new Node() )
-{
-
-}
+{}
 
 /*!
  * \brief Tree::add
@@ -18,8 +16,7 @@ Tree::Tree() : _root_node( new Node() )
  */
 void Tree::add(const Itemset &itemset, const Tidset &tidset)
 {
-    const auto node = Node( itemset, tidset );
-    _root_node->add_child( node );
+    _root_node->add_child( Node( itemset, tidset ) );
 }
 
 /*!
@@ -82,7 +79,6 @@ void Tree::remove_node(Node& node_ref, const Itemset &itemset)
  */
 void Tree::remove(const Itemset &itemset)
 {
-//    std::cerr << "Remove: " << itemset << std::endl; // TODO remove debug output
     Node & root_node = (*_root_node);
     remove_node( root_node, itemset );
 }
@@ -97,13 +93,10 @@ void Tree::replace_item(Node& node_ref, const Itemset &itemset, const Itemset &i
 {
     assert( itemset.size() != 0 );
     assert( itemset_to.size() != 0 );
-
     if ( node_ref.itemset().size() >= itemset.size() ) {
         if ( ! std::includes( node_ref.itemset().cbegin(), node_ref.itemset().cend(), itemset_to.cbegin(), itemset_to.cend() ) ) {
-            bool found_all = true;
             // Look for all items
-            found_all = std::includes( node_ref.itemset().cbegin(), node_ref.itemset().cend(), itemset.cbegin(), itemset.cend() );
-            if ( found_all ) {
+            if ( std::includes( node_ref.itemset().cbegin(), node_ref.itemset().cend(), itemset.cbegin(), itemset.cend() ) ) {
                 // Remove all occurence of itemset
                 std::for_each( itemset.cbegin(), itemset.cend(), [&]( const Item & item ) {
                     node_ref.itemset().erase( std::find( node_ref.itemset().begin(), node_ref.itemset().end(), item ) );
@@ -117,13 +110,11 @@ void Tree::replace_item(Node& node_ref, const Itemset &itemset, const Itemset &i
             }
         }
     }
-
     // Apply for each children
     std::for_each( node_ref.children_ref().begin(), node_ref.children_ref().end(), [&]( std::shared_ptr<Node> & shared_node ) {
         Node & child_ref = (*shared_node);
         replace_item( child_ref, itemset, itemset_to );
     } );
-
 }
 
 /*!
@@ -133,7 +124,6 @@ void Tree::replace_item(Node& node_ref, const Itemset &itemset, const Itemset &i
  */
 void Tree::replace(const Itemset &itemset, const Itemset &itemset_to)
 {
-//    std::cerr << "Replace: " << itemset << " by: " << itemset_to << std::endl; // TODO remove debug output
     Node & root_node = (*_root_node);
     replace_item( root_node, itemset, itemset_to  );
 }

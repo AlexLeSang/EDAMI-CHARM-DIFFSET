@@ -32,20 +32,6 @@ CSet Charm::charm(const Database &database, const unsigned int min_sup)
 
             ++ transaction_counter;
         } );
-        // TODO remove debug output
-        /*
-            {
-                std::cerr << "item_map = \n";
-                std::for_each( item_map.cbegin(), item_map.cend(), []( decltype(item_map)::const_reference key_value ) {
-                    std::cerr << "(" << key_value.first << ":<";
-                    unsigned int index = key_value.second.size();
-                    std::for_each( key_value.second.cbegin(), key_value.second.cend(), [&]( const TID & tid ) {
-                        std::cerr << tid << ( --index ? ',' : '>' );
-                    } );
-                    std::cerr << ")\n";
-                } );
-            }
-            */
         // Fill the tree
         {
             std::for_each( item_map.cbegin(), item_map.cend(), [&]( decltype(item_map)::const_reference key_value ) {
@@ -55,13 +41,14 @@ CSet Charm::charm(const Database &database, const unsigned int min_sup)
                     p.add( itemset, key_value.second );
                 }
             } );
-            //            P.print_tree(); // TODO remove debug output
         }
 
     }
     auto c_set = CSet();
     charm_extend( p, c_set, min_sup );
-    //        std::cerr << "c_set = \n" << c_set << std::endl; // TODO remove debug output
+#ifdef SIMPLE_TEST
+    std::cerr << "c_set: \n" << c_set << std::endl;
+#endif
     return c_set;
 }
 
@@ -111,7 +98,7 @@ void Charm::charm_extend(Tree &p_tree, CSet &c_set, const unsigned int min_sup)
  */
 void Charm::charm_property(Tree &p_i_tree, Tree &p_tree, Node &test_node, Node &Xi, Node &Xj, const unsigned int min_sup)
 {
-    if ( test_node.tidset().size() >= min_sup ) {
+    if ( sup( test_node ) > min_sup ) {
         if ( tidset_equal(Xi, Xj) ) {
             property_1( p_i_tree, p_tree, Xj, Xi, test_node );
         }
@@ -190,7 +177,8 @@ void Charm::tidset_intersection(Node &Xj, Tidset &Y)
  */
 void Charm::property_1(Tree &p_i_tree, Tree &p_tree, Node &Xj, Node &Xi, Node &test_node)
 {
-    p_tree.remove( Xj.itemset() );
+//    p_tree.remove( Xj.itemset() );
+    Xj.set_erased();
     const auto itemset_to_replace = Xi.itemset();
     p_i_tree.replace( itemset_to_replace, test_node.itemset() );
     p_tree.replace( itemset_to_replace, test_node.itemset() );
@@ -241,7 +229,7 @@ void Charm::property_4(Tree &p_i_tree, Node &test_node)
  */
 bool Charm::tidset_equal(const Node &Xi, const Node &Xj)
 {
-    return ( ( Xi.tidset().size() == Xj.tidset().size() ) && std::equal( Xi.tidset().cbegin(), Xi.tidset().cend(), Xj.tidset().cbegin() ) );
+    return ( ( sup( Xi ) == sup( Xj ) ) && std::equal( Xi.tidset().cbegin(), Xi.tidset().cend(), Xj.tidset().cbegin() ) );
 }
 
 /*!

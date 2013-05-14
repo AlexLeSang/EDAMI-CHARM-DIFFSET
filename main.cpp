@@ -22,7 +22,6 @@ int main( int argc, const char * argv[] )
         print_usage();
         return -1;
     }
-
     std::vector < std::string > argv_vector( argc - 1 );
     auto argv_index = argc - 1;
     while ( argv_index -- ) {
@@ -32,8 +31,6 @@ int main( int argc, const char * argv[] )
     std::for_each ( argv_vector.cbegin(), argv_vector.cend(), []( const std::string & str ) {
         std::cout << str << '\n';
     } );
-
-
     // Read support
     unsigned int min_sup = 0;
     try {
@@ -44,7 +41,6 @@ int main( int argc, const char * argv[] )
         print_usage();
         return -1;
     }
-
     // Read database
     Database database;
     {
@@ -53,19 +49,18 @@ int main( int argc, const char * argv[] )
         data_stream.open( database_filename );
         if ( data_stream.is_open() ) {
             DatabaseReader< n_of_fields >::read_database( data_stream, database );
-            std::cerr << "Database was read" << std::endl; // TODO remove debug output
+            std::cerr << "Database was read" << std::endl;
         }
         else {
             std::cerr << "Cannot open file: " << database_filename << std::endl;
             print_usage();
             return -1;
         }
-        std::cerr << "Database size: " << database.size() << std::endl; // TODO remove debug output
-//        std::cerr << database << std::endl; // TODO remove debug output
+        std::cerr << "Database size: " << database.size() << std::endl;
     }
 
     const auto c_set = Charm::charm( database, min_sup );
-    std::cerr << "Number of frequent itemsets: " << c_set.size() << std::endl;
+    std::cout << "Number of frequent itemsets: " << c_set.size() << std::endl;
     // Save results
     {
         std::ofstream c_set_stream;
@@ -73,7 +68,7 @@ int main( int argc, const char * argv[] )
         c_set_stream.open( result_filename );
         if ( c_set_stream.is_open() ) {
             ResultSaver::save(  c_set_stream, c_set );
-            std::cerr << "Results was saved" << std::endl; // TODO remove debug output
+            std::cout << "Results was saved" << std::endl;
         }
         else {
             std::cerr << "Cannot open file: " << result_filename << std::endl;
@@ -81,7 +76,6 @@ int main( int argc, const char * argv[] )
             return -1;
         }
     }
-
     return 0;
 }
 

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include "Typedefs.hpp"
+
 /*!
  * \brief Node::Node
  */
@@ -9,9 +11,7 @@ Node::Node() :
     _itemset( Itemset() ),
     _tidset( Tidset() ),
     _is_erased( false )
-{
-
-}
+{}
 
 /*!
  * \brief Node::Node
@@ -22,9 +22,7 @@ Node::Node(const Itemset &itemset, const Tidset &tidset) :
     _itemset( itemset ),
     _tidset( tidset ),
     _is_erased( false )
-{
-
-}
+{}
 
 /*!
  * \brief Node::Node
@@ -37,9 +35,7 @@ Node::Node(const Itemset &itemset, const Tidset &tidset, Node * parent_ptr) :
     _tidset( tidset ),
     _parent( parent_ptr ),
     _is_erased( false )
-{
-
-}
+{}
 
 /*!
  * \brief Node::Node
@@ -51,9 +47,7 @@ Node::Node(const Node &r_node) :
     _parent( r_node.parent() ),
     _children( r_node.children() ),
     _is_erased( r_node.is_erased() )
-{
-
-}
+{}
 
 /*!
  * \brief Node::operator =
@@ -94,33 +88,28 @@ void Node::set_erased()
 void Node::add_child(const Node &node_ref)
 {
     std::shared_ptr< Node > node( new Node( node_ref ) );
-
     node->set_parent( this );
     _children.push_back( node );
-
     /* Lexicographic orded
     std::sort( _children.begin(), _children.end(), [] ( std::shared_ptr< Node > ch1, std::shared_ptr< Node > ch2 ) {
-        return ( ch1->itemset() < ch2->itemset() );
+        return ( sup( ch1 ) < sup( ch2 ) );
     } );
     */
-
     //    /* Increasing order of sup
     std::sort( _children.begin(), _children.end(), [] ( std::shared_ptr< Node > ch1, std::shared_ptr< Node > ch2 ) {
-        return ( ch1->tidset().size() < ch2->tidset().size() ); // Sup
+        return ( sup( *ch1 ) < sup( *ch2 ) ); // Sup
     } );
     //    */
-
     /* Increasing order of sup and lexicograph
     std::sort( _children.begin(), _children.end(), [] ( std::shared_ptr< Node > ch1, std::shared_ptr< Node > ch2 ) {
-        if ( ch1->tidset().size() != ch2->tidset().size() ) {
-            return ( ch1->tidset().size() < ch2->tidset().size() ); // Sup
+        if ( sup( ch1 ) != sup( ch2 ) ) {
+            return ( sup( ch1 ) < sup( ch2 ) ); // Sup
         }
         else {
             return ( ch1->itemset() < ch2->itemset() ); // Lexicograph
         }
     } );
     */
-
 }
 
 /*!

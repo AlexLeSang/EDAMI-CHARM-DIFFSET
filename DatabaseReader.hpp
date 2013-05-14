@@ -24,7 +24,8 @@ public:
      * \param data_stream
      * \param database
      */
-    /* Test database
+//    /* Test database
+#ifdef SIMPLE_TEST
     void operator ()(std::ifstream & data_stream, Database & database) const
     {
         std::string s;
@@ -37,8 +38,8 @@ public:
             }
         }
     }
-    */
-
+//    */
+#else
     // Chess
 //    /*
     void operator ()(std::ifstream & data_stream, Database & database) const
@@ -62,7 +63,7 @@ public:
         }
     }
 //    */
-
+#endif
     /*!
      * \brief read_database
      * \param data_stream

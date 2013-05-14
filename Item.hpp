@@ -6,8 +6,11 @@
 /*!
  * \brief Item
  */
+#ifdef SIMPLE_TEST
+typedef char Item;
+#else
 typedef unsigned int Item;
-
+#endif
 /*!
  * \brief The item_hash class
  */

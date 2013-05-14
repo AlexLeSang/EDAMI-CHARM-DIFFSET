@@ -15,6 +15,9 @@ public:
     Node();
     Node(const Itemset & itemset, const Tidset & tidset);
     Node(const Itemset & itemset, const Tidset & tidset, Node * parent_ptr);
+    Node(const Node & r_node);
+
+    Node & operator = ( const Node & r_node );
 
     void add_child(const Node & node_ref );
     const std::vector< std::shared_ptr < Node > > & children() const;
@@ -27,19 +30,14 @@ public:
     Itemset & itemset();
     const Tidset & tidset() const;
 
-    Node( const Node & r_node );
-    Node & operator = ( const Node & r_node );
-
     bool is_erased() const;
     void set_erased();
 
 private:
     Itemset _itemset;
     Tidset _tidset;
-
     Node * _parent;
     std::vector < std::shared_ptr < Node > > _children;
-
     bool _is_erased;
 };
 
