@@ -82,6 +82,35 @@ void Node::set_erased()
 }
 
 /*!
+ * \brief Node::equal
+ * \param r_node
+ * \return
+ */
+bool Node::equal(const Node &r_node) const
+{
+    return ( ( sup() == r_node.sup() ) && std::equal( this->tidset().cbegin(), this->tidset().cend(), r_node.tidset().cbegin() ) );
+}
+
+/*!
+ * \brief Node::is_subset
+ * \param r_node
+ * \return
+ */
+bool Node::is_superset_of( const Node r_node ) const
+{
+    return std::includes( _tidset.cbegin(), _tidset.cend(), r_node.tidset().cbegin(), r_node.tidset().cend() );
+}
+
+/*!
+ * \brief Node::sup
+ * \return
+ */
+unsigned int Node::sup() const
+{
+    return _tidset.size();
+}
+
+/*!
  * \brief Node::add_child
  * \param node_ref
  */
@@ -97,7 +126,7 @@ void Node::add_child(const Node &node_ref)
     */
     //    /* Increasing order of sup
     std::sort( _children.begin(), _children.end(), [] ( std::shared_ptr< Node > ch1, std::shared_ptr< Node > ch2 ) {
-        return ( sup( *ch1 ) < sup( *ch2 ) ); // Sup
+        return ( ch1->sup() < ch2->sup() ); // Sup
     } );
     //    */
     /* Increasing order of sup and lexicograph

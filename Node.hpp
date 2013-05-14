@@ -28,10 +28,16 @@ public:
 
     const Itemset & itemset() const;
     Itemset & itemset();
-    const Tidset & tidset() const;
 
     bool is_erased() const;
     void set_erased();
+
+    unsigned int sup() const;
+
+    bool equal( const Node & r_node) const;
+    bool is_superset_of(const Node r_node) const;
+
+    const Tidset & tidset() const;
 
 private:
     Itemset _itemset;

@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <list>
+#include <thread>
 
 /*!
  * \brief Tree::Tree
@@ -67,8 +68,7 @@ void Tree::remove_node(Node& node_ref, const Itemset &itemset)
     }
     if ( ! found ) {
         std::for_each( node_ref.children_ref().begin(), node_ref.children_ref().end(), [&]( std::shared_ptr<Node> & shared_node ) {
-            Node & child_ref = (*shared_node);
-            remove_node( child_ref, itemset );
+            remove_node( (*shared_node), itemset );
         } );
     }
 }
@@ -89,7 +89,7 @@ void Tree::remove(const Itemset &itemset)
  * \param itemset
  * \param itemset_to
  */
-void Tree::replace_item(Node& node_ref, const Itemset &itemset, const Itemset &itemset_to )
+void Tree::replace_item(Node& node_ref, const Itemset &itemset, const Itemset &itemset_to)
 {
     assert( itemset.size() != 0 );
     assert( itemset_to.size() != 0 );
@@ -110,11 +110,24 @@ void Tree::replace_item(Node& node_ref, const Itemset &itemset, const Itemset &i
             }
         }
     }
+//    /* Sequential version
     // Apply for each children
     std::for_each( node_ref.children_ref().begin(), node_ref.children_ref().end(), [&]( std::shared_ptr<Node> & shared_node ) {
-        Node & child_ref = (*shared_node);
-        replace_item( child_ref, itemset, itemset_to );
+        replace_item( (*shared_node), itemset, itemset_to );
     } );
+//    */
+    /* Parallel version
+    std::vector< std::thread > thread_vector( node_ref.children().size() );
+    unsigned int index = 0;
+    std::for_each( node_ref.children_ref().begin(), node_ref.children_ref().end(), [&]( std::shared_ptr<Node> & shared_node ) {
+        thread_vector[ index ] = std::thread ( replace_item, std::ref(*shared_node), itemset, itemset_to );
+        ++index;
+    } );
+
+    for( auto && th : thread_vector ) {
+        th.join();
+    }
+    */
 }
 
 /*!

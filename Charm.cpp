@@ -68,14 +68,14 @@ void Charm::charm_extend(Tree &p_tree, CSet &c_set, const unsigned int min_sup)
         Itemset X = Xi.itemset();
         Tidset Y = Xi.tidset();
         // For each Xj
-        for (  auto internal_it = it + 1; internal_it != root->children().end(); ++ internal_it ) {
+        for ( auto internal_it = it + 1; internal_it != root->children().end(); ++ internal_it ) {
             Node & Xj = (*(*internal_it));
             if ( Xj.is_erased() ) continue;
             X = Xi.itemset();
-            itemset_union( X, Xj );
             Y = Xi.tidset();
+            itemset_union( X, Xj );
             tidset_intersection( Xj, Y );
-            Node test_node( X, Y );
+            const Node test_node( X, Y );
             charm_property( p_i_tree, p_tree, test_node, Xi, Xj, min_sup );
         }
         if ( ! ( root->children().empty() ) ) {
@@ -96,18 +96,18 @@ void Charm::charm_extend(Tree &p_tree, CSet &c_set, const unsigned int min_sup)
  * \param Xj
  * \param min_sup
  */
-void Charm::charm_property(Tree &p_i_tree, Tree &p_tree, Node &test_node, Node &Xi, Node &Xj, const unsigned int min_sup)
+void Charm::charm_property(Tree &p_i_tree, Tree &p_tree, const Node &test_node, Node &Xi, Node &Xj, const unsigned int min_sup)
 {
-    if ( sup( test_node ) > min_sup ) {
-        if ( tidset_equal(Xi, Xj) ) {
+    if ( test_node.sup() > min_sup ) {
+        if ( Xi.equal( Xj ) ) {
             property_1( p_i_tree, p_tree, Xj, Xi, test_node );
         }
         else {
-            if ( is_subset( Xi, Xj ) ) {
+            if ( Xj.is_superset_of( Xi ) ) {
                 property_2( p_tree, p_i_tree, test_node, Xi );
             }
             else {
-                if ( is_subset( Xj, Xi ) ) {
+                if ( Xi.is_superset_of( Xj ) ) {
                     property_3( p_i_tree, p_tree, Xj, test_node );
                 }
                 else {
@@ -175,7 +175,7 @@ void Charm::tidset_intersection(Node &Xj, Tidset &Y)
  * \param Xi
  * \param test_node
  */
-void Charm::property_1(Tree &p_i_tree, Tree &p_tree, Node &Xj, Node &Xi, Node &test_node)
+void Charm::property_1(Tree &p_i_tree, Tree &p_tree, Node &Xj, Node &Xi, const Node &test_node)
 {
 //    p_tree.remove( Xj.itemset() );
     Xj.set_erased();
@@ -191,7 +191,7 @@ void Charm::property_1(Tree &p_i_tree, Tree &p_tree, Node &Xj, Node &Xi, Node &t
  * \param test_node
  * \param Xi
  */
-void Charm::property_2(Tree &p_tree, Tree &p_i_tree, Node &test_node, Node &Xi)
+void Charm::property_2(Tree &p_tree, Tree &p_i_tree, const Node &test_node, Node &Xi)
 {
     const auto itemset_to_replace = Xi.itemset();
     p_i_tree.replace( itemset_to_replace, test_node.itemset() );
@@ -205,7 +205,7 @@ void Charm::property_2(Tree &p_tree, Tree &p_i_tree, Node &test_node, Node &Xi)
  * \param Xj
  * \param test_node
  */
-void Charm::property_3(Tree &p_i_tree, Tree &p_tree, Node &Xj, Node &test_node)
+void Charm::property_3(Tree &p_i_tree, Tree &p_tree, Node &Xj, const Node &test_node)
 {
     p_tree.remove( Xj.itemset() );
     p_i_tree.add( test_node.itemset(), test_node.tidset() );
@@ -216,29 +216,7 @@ void Charm::property_3(Tree &p_i_tree, Tree &p_tree, Node &Xj, Node &test_node)
  * \param p_i_tree
  * \param test_node
  */
-void Charm::property_4(Tree &p_i_tree, Node &test_node)
+void Charm::property_4(Tree &p_i_tree, const Node &test_node)
 {
     p_i_tree.add( test_node.itemset(), test_node.tidset() );
-}
-
-/*!
- * \brief Charm::tidset_equal
- * \param Xi
- * \param Xj
- * \return
- */
-bool Charm::tidset_equal(const Node &Xi, const Node &Xj)
-{
-    return ( ( sup( Xi ) == sup( Xj ) ) && std::equal( Xi.tidset().cbegin(), Xi.tidset().cend(), Xj.tidset().cbegin() ) );
-}
-
-/*!
- * \brief Charm::is_subset
- * \param subset
- * \param superset
- * \return
- */
-bool Charm::is_subset(const Node &subset, const Node &superset)
-{
-    return std::includes( superset.tidset().cbegin(), superset.tidset().cend(), subset.tidset().cbegin(), subset.tidset().cend() );
 }
