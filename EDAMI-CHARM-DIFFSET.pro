@@ -7,7 +7,7 @@
 QT       -= core
 QT       -= gui
 
-TARGET = EDAMI-CHARM
+TARGET = EDAMI-CHARM-DIFFSET
 CONFIG   += console
 CONFIG   -= app_bundle
 

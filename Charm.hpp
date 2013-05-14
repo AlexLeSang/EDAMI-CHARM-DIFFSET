@@ -15,7 +15,7 @@ public:
     static CSet charm( const Database & database, const unsigned int min_sup );
 
 private:
-    static void charm_extend(Tree & p_tree, CSet &c_set , const unsigned int min_sup);
+    static void charm_extend(Tree & p_tree, CSet &c_set, const unsigned int min_sup);
     static void charm_property(Tree & p_i_tree, Tree & p_tree, const Node &test_node, Node & Xi, Node & Xj, const unsigned int min_sup);
     static bool is_subsumed(const CSet &c_set, const Itemset & X, const Tidset & Y);
     static void itemset_union(Itemset & X, Node & Xj);
