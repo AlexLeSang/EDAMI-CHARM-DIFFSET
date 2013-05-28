@@ -147,7 +147,7 @@ bool Node::is_superset_of( const Node r_node ) const
     const auto r_mist = r_node.mistakes( _diffset );
     const auto mist = mistakes( r_node.diffset() );
 
-    if ( (mist > 0) && ( r_mist == 0 ) ) {
+    if ( ( mist > 0 ) && ( r_mist == 0 ) ) {
         // is superset
         return true;
     }
