@@ -14,42 +14,40 @@ typedef std::unordered_map< Item, Diffset, item_hash > ItemMap;
  */
 CSet Charm::charm(const Database &database, const unsigned int min_sup)
 {
-    Tree p;
     // Create a P tree
-    {
-        ItemMap item_map;
-        // For each itemset
-        TID transaction_counter = 1;
-        std::for_each( database.cbegin(), database.cend(), [&] ( const Itemset & itemset ) {
-            // For each item in the itemset
-            std::for_each( itemset.cbegin(), itemset.cend(), [&]( const Item & item ) {
-                // If there is such item increase it's support
-                const auto got = item_map.find( item );
-                if ( item_map.cend() != got ) {
-                    got->second.push_back( transaction_counter );
-                }
-                else {
-                    Tidset new_tidset( 1 );
-                    new_tidset.at( 0 ) = transaction_counter;
-                    item_map.insert( std::make_pair( item, new_tidset ) );
-                }
-            } );
-            ++ transaction_counter;
-        } );
-        --transaction_counter;
-
-        // Translate tidset into diffset
-        std::for_each( item_map.begin(), item_map.end(), [&]( ItemMap::reference key_value ) {
-            const auto tidset = std::move( key_value.second );
-            // Transfort to a diffset
-            for ( unsigned int index = 1; index <= transaction_counter; ++ index ) {
-                if ( tidset.cend() == std::find( tidset.cbegin(), tidset.cend(), index ) ) {
-                    key_value.second.push_back( index );
-                }
+    ItemMap item_map;
+    // For each itemset
+    TID transaction_counter = 1;
+    std::for_each( database.cbegin(), database.cend(), [&] ( const Itemset & itemset ) {
+        // For each item in the itemset
+        std::for_each( itemset.cbegin(), itemset.cend(), [&]( const Item & item ) {
+            // If there is such item increase it's support
+            const auto got = item_map.find( item );
+            if ( item_map.cend() != got ) {
+                got->second.push_back( transaction_counter );
+            }
+            else {
+                Tidset new_tidset( 1 );
+                new_tidset.at( 0 ) = transaction_counter;
+                item_map.insert( std::make_pair( item, new_tidset ) );
             }
         } );
+        ++ transaction_counter;
+    } );
+    --transaction_counter;
 
-        /*
+    // Translate tidset into diffset
+    std::for_each( item_map.begin(), item_map.end(), [&]( ItemMap::reference key_value ) {
+        const auto tidset = std::move( key_value.second );
+        // Transfort to a diffset
+        for ( unsigned int index = 1; index <= transaction_counter; ++ index ) {
+            if ( tidset.cend() == std::find( tidset.cbegin(), tidset.cend(), index ) ) {
+                key_value.second.push_back( index );
+            }
+        }
+    } );
+
+    /*
         {
             std::cerr << "item_map = \n";
             for ( const auto & item : item_map ) {
@@ -59,24 +57,27 @@ CSet Charm::charm(const Database &database, const unsigned int min_sup)
         }
                 */
 
-        // Fill the tree
-        {
-            //            std::cerr << "transaction_counter = " << transaction_counter << std::endl;
-            const unsigned int sum_of_trans_id = transaction_counter * (transaction_counter - 1) / 2;
-            std::for_each( item_map.cbegin(), item_map.cend(), [&]( ItemMap::const_reference key_value ) {
-                if ( min_sup < (transaction_counter - key_value.second.size()) ) {
-                    Itemset itemset;
-                    itemset.push_back( key_value.first );
-                    const unsigned int hash = sum_of_trans_id - std::accumulate( key_value.second.cbegin(), key_value.second.cend(), 0 );
-                    const unsigned int sup = (transaction_counter - key_value.second.size());
-                    //                    std::cerr << "Item: " << key_value.first << " hash: " << hash << " sup: " << sup << std::endl; // TODO remove debug putput
-                    p.add( itemset, key_value.second, sup, hash );
-                }
-            } );
-        }
-        //        std::cerr << "p = \n"; p.print_tree(); std::cerr << std::endl; // Chech if the tree was correctly constructed
-        //        exit(-1);
+    // Fill the tree
+    const unsigned int sum_of_trans_id = transaction_counter * (transaction_counter - 1) / 2;
+    Node root_node( Itemset(), Diffset(), transaction_counter, sum_of_trans_id );
+    Tree p( root_node );
+    {
+        //            std::cerr << "transaction_counter = " << transaction_counter << std::endl;
+        std::for_each( item_map.cbegin(), item_map.cend(), [&]( ItemMap::const_reference key_value ) {
+            if ( min_sup < (transaction_counter - key_value.second.size()) ) {
+                Itemset itemset;
+                itemset.push_back( key_value.first );
+                //                    const unsigned int hash = sum_of_trans_id - std::accumulate( key_value.second.cbegin(), key_value.second.cend(), 0 );
+                //                    const unsigned int sup = (transaction_counter - key_value.second.size());
+                //                    std::cerr << "Item: " << key_value.first << " hash: " << hash << " sup: " << sup << std::endl; // TODO remove debug putput
+                const Node n( itemset, key_value.second, & root_node );
+                //                    p.add( itemset, key_value.second, sup, hash );
+                p.add( n );
+            }
+        } );
     }
+    //        std::cerr << "p = \n"; p.print_tree(); std::cerr << std::endl; // Chech if the tree was correctly constructed
+    //        exit(-1);
     auto c_set = CSet();
     charm_extend( p, c_set, min_sup );
 
@@ -96,11 +97,13 @@ void Charm::charm_extend(Tree &p_tree, CSet &c_set, const unsigned int min_sup)
     for ( auto it = root->children().begin(); it != root->children().end(); ++ it ) {
         Node & Xi = (*(*it));
         if ( Xi.is_erased() ) continue;
-        std::cerr << "Parent node = " << Xi << std::endl;
-        Tree p_i_tree;
+        std::cerr << "\nParent node = " << Xi << std::endl;
+        //        Tree p_i_tree;
+        Tree p_i_tree( Xi );
         Itemset X = Xi.itemset();
         Diffset Y = Xi.diffset();
-        Node test_node( Xi );
+        //        Node test_node( Xi ); // It also should be updated
+        Node test_node; // It also should be updated
         // For each Xj
         for ( auto internal_it = it + 1; internal_it != root->children().end(); ++ internal_it ) {
             Node & Xj = (*(*internal_it));
@@ -110,7 +113,6 @@ void Charm::charm_extend(Tree &p_tree, CSet &c_set, const unsigned int min_sup)
             Y = Xi.diffset();
             itemset_union( X, Xj );
             diffset_difference( Y, Xj );
-//            const Node test_node( X, Y, &Xi );
             Node test_node = Node( X, Y, &Xi );
             std::cerr << "test_node: " << test_node << std::endl; // TODO remove debug output
             charm_property( p_i_tree, p_tree, test_node, Xi, Xj, min_sup );
@@ -118,9 +120,19 @@ void Charm::charm_extend(Tree &p_tree, CSet &c_set, const unsigned int min_sup)
         if ( ! ( root->children().empty() ) ) {
             charm_extend( p_i_tree, c_set, min_sup );
         }
-        if ( ! is_subsumed( c_set, test_node ) ) {
-            std::cerr << "Insert node " << test_node << std::endl; // TODO remvoe debug output
-            c_set.insert( CSet::value_type( cset_key_t( test_node.diffset(), test_node.parent()->hashkey() ), cset_val_t( test_node.itemset(), test_node.sup() ) ) );
+
+
+        if ( test_node.itemset().empty() ) {
+            if ( ! is_subsumed( c_set, Xi ) ) {
+                std::cerr << "Insert node " << Xi << std::endl; // TODO remvoe debug output
+                c_set.insert( CSet::value_type( cset_key_t( Xi.diffset(), Xi.parent()->hashkey() ), cset_val_t( Xi.itemset(), Xi.sup() ) ) );
+            }
+        }
+        else {
+            if ( ! is_subsumed( c_set, test_node ) ) {
+                std::cerr << "Insert node " << test_node << std::endl; // TODO remvoe debug output
+                c_set.insert( CSet::value_type( cset_key_t( test_node.diffset(), test_node.parent()->hashkey() ), cset_val_t( test_node.itemset(), test_node.sup() ) ) );
+            }
         }
     }
 }
@@ -177,14 +189,16 @@ bool Charm::is_subsumed(const CSet & c_set, const Node & node)
     const Diffset & Y = node.diffset();
 
     bool is_subsumed = false;
+    //    const int parent_hashkey = node.hashkey() + std::accumulate( node.diffset().cbegin(), node.diffset().cend(), 0 );
+    //    std::cerr << "parent_hashkey = " << parent_hashkey << std::endl;
     const int hashkey = diffset_hash::hash( std::make_pair( Y, node.parent()->hashkey() ) );
-    std::cerr << "hashkey = " << hashkey << std::endl;
+    //    std::cerr << "hashkey = " << hashkey << std::endl;
     const auto range = c_set.equal_range( std::make_pair( Y, hashkey ) );
     for ( auto it = range.first; it != range.second; ++ it ) {
         const Itemset & C = (*it).second.first;
         const auto sup = (*it).second.second;
-        std::cerr << "C = " << C << std::endl;
-        std::cerr << "sup = " << sup << std::endl;
+        //        std::cerr << "C = " << C << std::endl;
+        //        std::cerr << "sup = " << sup << std::endl;
         if ( node.sup() == sup ) {
             const bool includes = std::includes( C.cbegin(), C.cend(), X.cbegin(), X.cend() );
             if ( includes ) {

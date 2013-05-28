@@ -15,6 +15,7 @@ class Tree
 {
 public:
     Tree();
+    Tree(const Node & node);
     void add(const Itemset &itemset, const Diffset & diffset , const unsigned int sup, const unsigned int hash);
     void add(const Node & node);
     std::weak_ptr < Node > root_node();

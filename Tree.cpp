@@ -11,6 +11,13 @@ Tree::Tree() : _root_node( new Node() )
 {}
 
 /*!
+ * \brief Tree::Tree
+ * \param node
+ */
+Tree::Tree(const Node &node) : _root_node( new Node( node ) )
+{}
+
+/*!
  * \brief Tree::add
  * \param itemset
  * \param tidset
@@ -99,6 +106,8 @@ void Tree::replace_item(Node& node_ref, const Itemset &itemset, const Itemset &i
  */
 void Tree::replace(const Itemset &itemset, const Itemset &itemset_to)
 {
+
+//    std::cerr << "Replace " << itemset << " to " << itemset_to << std::endl;
     Node & root_node = (*_root_node);
     replace_item( root_node, itemset, itemset_to  );
 }
