@@ -15,9 +15,18 @@ Tree::Tree() : _root_node( new Node() )
  * \param itemset
  * \param tidset
  */
-void Tree::add(const Itemset &itemset, const Tidset &tidset)
+void Tree::add(const Itemset &itemset, const Diffset & diffset, const unsigned int sup, const unsigned int hash)
 {
-    _root_node->add_child( Node( itemset, tidset ) );
+    _root_node->add_child( Node( itemset, diffset, sup, hash ) );
+}
+
+/*!
+ * \brief Tree::add
+ * \param node
+ */
+void Tree::add(const Node &node)
+{
+    _root_node->add_child( node );
 }
 
 /*!
@@ -50,30 +59,6 @@ void Tree::print_tree() const
     print_node( std::weak_ptr< Node > ( _root_node ) );
 }
 
-//void Tree::remove_node(Node& node_ref, const Itemset &itemset)
-//{
-//    bool found = false;
-//    for ( auto it = node_ref.children_ref().begin(); it != node_ref.children_ref().end(); ++ it ) {
-//        auto & child = (*(*it));
-//        if ( itemset == child.itemset() ) {
-//            found = true;
-//            child.set_erased();
-//            break;
-//        }
-//    }
-//    if ( ! found ) {
-//        std::for_each( node_ref.children_ref().begin(), node_ref.children_ref().end(), [&]( std::shared_ptr<Node> & shared_node ) {
-//            remove_node( (*shared_node), itemset );
-//        } );
-//    }
-//}
-
-//void Tree::remove(const Itemset &itemset)
-//{
-//    Node & root_node = (*_root_node);
-//    remove_node( root_node, itemset );
-//}
-
 /*!
  * \brief Tree::replace_item
  * \param node_ref
@@ -101,24 +86,10 @@ void Tree::replace_item(Node& node_ref, const Itemset &itemset, const Itemset &i
             }
         }
     }
-//    /* Sequential version
     // Apply for each children
     std::for_each( node_ref.children_ref().begin(), node_ref.children_ref().end(), [&]( std::shared_ptr<Node> & shared_node ) {
         replace_item( (*shared_node), itemset, itemset_to );
     } );
-//    */
-    /* Parallel version
-    std::vector< std::thread > thread_vector( node_ref.children().size() );
-    unsigned int index = 0;
-    std::for_each( node_ref.children_ref().begin(), node_ref.children_ref().end(), [&]( std::shared_ptr<Node> & shared_node ) {
-        thread_vector[ index ] = std::thread ( replace_item, std::ref(*shared_node), itemset, itemset_to );
-        ++index;
-    } );
-
-    for( auto && th : thread_vector ) {
-        th.join();
-    }
-    */
 }
 
 /*!
