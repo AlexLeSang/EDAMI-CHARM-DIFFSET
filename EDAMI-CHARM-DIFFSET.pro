@@ -30,9 +30,10 @@ HEADERS += \
     DatabaseReader.hpp \
     Item.hpp \
     Itemset.hpp \
-    Tidset.hpp \
-    Database.hpp
+    Database.hpp \
+    Diffset.hpp
 
 #DEFINES += "TREE_TEST"
 DEFINES += "SIMPLE_TEST"
+#DEFINES += "CSET_TEST"
 QMAKE_CXX = g++-4.7
