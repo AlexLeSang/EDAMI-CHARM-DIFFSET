@@ -61,7 +61,7 @@ int main( int argc, const char * argv[] )
             return -1;
         }
         std::cerr << "Database size: " << database.size() << std::endl;
-        //        std::cerr << database << std::endl; // TODO remvoe debug output
+                std::cerr << database << std::endl; // TODO remvoe debug output
     }
 
     const auto c_set = Charm::charm( database, min_sup );

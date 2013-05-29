@@ -39,8 +39,8 @@ public:
     }
 };
 
-///*
 #ifdef SIMPLE_TEST
+/*
 inline std::ostream & operator << ( std::ostream & os, const Diffset & diffset )
 {
     unsigned index = diffset.size();
@@ -52,7 +52,7 @@ inline std::ostream & operator << ( std::ostream & os, const Diffset & diffset )
     }
     return os;
 }
-//*/
+*/
 #endif
 /*
 inline std::ostream & operator << ( std::ostream & os, const Tidset & tidset )

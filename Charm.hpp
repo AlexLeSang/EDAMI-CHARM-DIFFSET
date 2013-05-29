@@ -1,10 +1,11 @@
 #ifndef CHARM_HPP
 #define CHARM_HPP
 
-#include "Tree.hpp"
 #include "CSet.hpp"
 
 #include "Database.hpp"
+
+#include "Node.hpp"
 
 /*!
  * \brief The Charm class
@@ -16,18 +17,13 @@ public:
 
 private:
     static void charm_extend(Node &p_tree, CSet &c_set, const unsigned int min_sup);
-    static void charm_property(Tree & p_i_tree, Tree & p_tree, const Node &test_node, Node & Xi, Node & Xj, const unsigned int min_sup);
+//    static void charm_property(Tree & p_i_tree, Tree & p_tree, const Node &test_node, Node & Xi, Node & Xj, const unsigned int min_sup);
 public:
     static bool is_subsumed(const CSet &c_set, const Node &node);
 private:
     static void itemset_union(Itemset & X, const Node &Xj);
     static void diffset_difference(Diffset &Y, const Node & Xj);
-    static void property_1(Tree & p_i_tree, Tree & p_tree, Node & Xj, Node & Xi, const Node &test_node);
-    static void property_2(Tree & p_tree, Tree & p_i_tree, const Node &test_node, Node & Xi);
-    static void property_3(Tree & p_i_tree, Node & Xj, const Node &test_node);
-    static void property_4(Tree & p_i_tree, const Node &test_node);
-    static bool tidset_equal(const Node& Xi, const Node& Xj);
-    static bool is_subset(const Node& subset, const Node& superset);
+
     static void replace_item(Node& node_ref, const Itemset &itemset, const Itemset &itemset_to);
 };
 

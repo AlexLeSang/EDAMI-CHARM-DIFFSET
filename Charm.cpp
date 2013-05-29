@@ -3,6 +3,7 @@
 #include "Diffset.hpp"
 
 #include <iterator>
+#include <cassert>
 
 typedef std::unordered_map< Item, Diffset, item_hash > ItemMap;
 
@@ -54,7 +55,7 @@ CSet Charm::charm(const Database &database, const unsigned int min_sup)
 //    Tree p( root_node );
     {
         std::for_each( item_map.cbegin(), item_map.cend(), [&]( ItemMap::const_reference key_value ) {
-            if ( min_sup < (transaction_counter - key_value.second.size()) ) {
+            if ( min_sup <= (transaction_counter - key_value.second.size()) ) {
                 Itemset itemset;
                 itemset.push_back( key_value.first );
                 const Node n( itemset, key_value.second, & root_node );
@@ -133,7 +134,7 @@ void Charm::charm_extend(Node &p_tree, CSet &c_set, const unsigned int min_sup)
             Node test_node( X, Y, &current_child );
 //            std::cerr << "  test_node = " << test_node << std::endl;
 
-            if ( test_node.sup() > min_sup ) {
+            if ( test_node.sup() >= min_sup ) {
                 if ( current_child.equal( internal_child ) ) {
 //                    std::cerr << "   property_1" << std::endl;
 //                    std::cerr << "Erase " << internal_child << std::endl;
@@ -208,44 +209,6 @@ void Charm::replace_item(Node& node_ref, const Itemset &itemset, const Itemset &
 }
 
 
-
-/*!
- * \brief Charm::charm_property
- * \param p_i_tree
- * \param p_tree
- * \param test_node
- * \param Xi
- * \param Xj
- * \param min_sup
- */
-void Charm::charm_property(Tree &p_i_tree, Tree &p_tree, const Node &test_node, Node &Xi, Node &Xj, const unsigned int min_sup)
-{
-    if ( test_node.sup() > min_sup ) {
-        if ( Xi.equal( Xj ) ) {
-//            std::cerr << "prorerty 1\n" << std::endl;
-            property_1( p_i_tree, p_tree, Xj, Xi, test_node );
-        }
-        else {
-            if ( Xj.is_superset_of( Xi ) ) {
-//                std::cerr << "prorerty 2\n" << std::endl;
-                property_2( p_tree, p_i_tree, test_node, Xi );
-            }
-            else {
-                if ( Xi.is_superset_of( Xj ) ) {
-//                    std::cerr << "prorerty 3\n" << std::endl;
-                    property_3( p_i_tree, Xj, test_node );
-                }
-                else {
-//                    std::cerr << "prorerty 4\n" << std::endl;
-                    property_4( p_i_tree, test_node );
-                }
-            }
-        }
-    }
-    else {
-//        std::cerr << "rejected\n" << std::endl;
-    }
-}
 
 /*!
  * \brief Charm::is_subsumed
@@ -329,58 +292,4 @@ void Charm::diffset_difference(Diffset & Y, const Node &Xj)
     result_diffset.resize( it - result_diffset.begin() );
 //    Y = result_diffset;
     std::swap( Y, result_diffset );
-}
-
-/*!
- * \brief Charm::property_1
- * \param p_i_tree
- * \param p_tree
- * \param Xj
- * \param Xi
- * \param test_node
- */
-void Charm::property_1(Tree &p_i_tree, Tree &p_tree, Node &Xj, Node &Xi, const Node &test_node)
-{
-    //    p_tree.remove( Xj.itemset() );
-    Xj.set_erased();
-    const auto itemset_to_replace = Xi.itemset();
-    p_i_tree.replace( itemset_to_replace, test_node.itemset() );
-    p_tree.replace( itemset_to_replace, test_node.itemset() );
-}
-
-/*!
- * \brief Charm::property_2
- * \param p_tree
- * \param p_i_tree
- * \param test_node
- * \param Xi
- */
-void Charm::property_2(Tree &p_tree, Tree &p_i_tree, const Node &test_node, Node &Xi)
-{
-    const auto itemset_to_replace = Xi.itemset();
-    p_i_tree.replace( itemset_to_replace, test_node.itemset() );
-    p_tree.replace( itemset_to_replace, test_node.itemset() );
-}
-
-/*!
- * \brief Charm::property_3
- * \param p_i_tree
- * \param p_tree
- * \param Xj
- * \param test_node
- */
-void Charm::property_3(Tree &p_i_tree, Node &Xj, const Node &test_node)
-{
-    Xj.set_erased();
-    p_i_tree.add( test_node );
-}
-
-/*!
- * \brief Charm::property_4
- * \param p_i_tree
- * \param test_node
- */
-void Charm::property_4(Tree &p_i_tree, const Node &test_node)
-{
-    p_i_tree.add( test_node );
 }

@@ -77,7 +77,9 @@ Node::Node(Node && m_node) :
     _parent( m_node.parent() ),
     _children( std::move( m_node.children() ) ),
     _is_erased( m_node.is_erased() ),
-    _sup( m_node.sup() )
+    _sup( m_node.sup() ),
+    _hash_key_setted( true ),
+    _hashkey( m_node.hashkey() )
 {
     std::cerr << "O_o, the move constructor had been called" << std::endl;
 }
