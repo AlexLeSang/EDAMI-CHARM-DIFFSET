@@ -12,41 +12,187 @@
 class Node
 {
 public:
-    Node();
-    Node(const Itemset & itemset, const Diffset & diffset, const unsigned int sup, const unsigned int hash);
-    Node(const Itemset & itemset, const Diffset & diffset, Node * parent_ptr);
-    Node(const Node & r_node);
-    Node(Node && m_node);
+    Node() :
+        _itemset( Itemset() ),
+        _diffset( Diffset() ),
+        _parent( nullptr ),
+        _is_erased( false ),
+        _sup( 0 ),
+        _hash_key_setted( false ),
+        _hashkey( 0 ) {}
+    Node(Itemset && rv_itemset, Diffset && rv_diffset, Node * parent_ptr) :
+        _itemset( std::move(rv_itemset) ),
+        _diffset( std::move(rv_diffset) ),
+        _parent( parent_ptr ),
+        _is_erased( false ),
+        _sup( 0 ),
+        _hash_key_setted( false ),
+        _hashkey( 0 ) {
+        calculate_support();
+        calculate_hashkey();
+    }
+    Node(const Itemset & itemset, const Diffset & diffset, Node * parent_ptr) :
+        _itemset( itemset ),
+        _diffset( diffset ),
+        _parent( parent_ptr ),
+        _is_erased( false ),
+        _sup( 0 ),
+        _hash_key_setted( false ),
+        _hashkey( 0 ) {
+        calculate_support();
+        calculate_hashkey();
+    }
+    Node(const Itemset & itemset, const Diffset & diffset, const unsigned int sup, const unsigned int hash) :
+        _itemset( itemset ),
+        _diffset( diffset ),
+        _parent( nullptr ),
+        _is_erased( false ),
+        _sup( sup ),
+        _hash_key_setted( true ),
+        _hashkey( hash ) {
+    }
+    Node(const Node & r_node) :
+        _itemset( r_node.itemset() ),
+        _diffset( r_node.diffset() ),
+        _parent( r_node.parent() ),
+        _children( r_node.children() ),
+        _is_erased( r_node.is_erased() ),
+        _sup( r_node.sup() ),
+        _hash_key_setted( true ),
+        _hashkey( r_node.hashkey() ) {}
+    Node(Node && m_node) :
+        _itemset( std::move( m_node.itemset() ) ),
+        _diffset( std::move( m_node.diffset() ) ),
+        _parent( m_node.parent() ),
+        _children( std::move( m_node.children() ) ),
+        _is_erased( m_node.is_erased() ),
+        _sup( m_node.sup() ),
+        _hash_key_setted( true ),
+        _hashkey( m_node.hashkey() ) {
+    }
 
-    Node & operator = ( const Node & r_node );
+    inline Node & operator = ( const Node & r_node ) {
+        if ( this != &r_node ) {
+            _itemset = r_node.itemset();
+            _diffset = r_node.diffset();
+            _children = r_node.children();
+            _parent = r_node.parent();
+            _is_erased = r_node.is_erased();
+            _sup = r_node.sup();
+            _hash_key_setted = true;
+            _hashkey = r_node.hashkey();
+        }
+        return *this;
+    }
 
-    void add_child(const Node & node_ref );
-    const std::vector< std::shared_ptr < Node > > & children() const;
-    std::vector< std::shared_ptr < Node > > & children_ref();
+    inline void add_child(const Node & node_ref ) {
+        std::shared_ptr< Node > node( new Node( node_ref ) );
+        node->set_parent( this );
+        _children.push_back( node );
+        std::sort( _children.begin(), _children.end(), [] ( std::shared_ptr< Node > ch1, std::shared_ptr< Node > ch2 ) {
+            return ( ch1->sup() < ch2->sup() ); // Sup
+        } );
+    }
+    inline void add_child(Itemset && itemset, Diffset && diffset) {
+        std::shared_ptr< Node > node( new Node( itemset, diffset, this ) );
+        _children.push_back( node );
+        std::sort( _children.begin(), _children.end(), [] ( std::shared_ptr< Node > ch1, std::shared_ptr< Node > ch2 ) {
+            return ( ch1->sup() < ch2->sup() ); // Sup
+        } );
+    }
+    inline const std::vector< std::shared_ptr < Node > > & children() const  {
+        return _children;
+    }
+    inline std::vector< std::shared_ptr < Node > > & children_ref() {
+        return _children;
+    }
 
-    Node * parent() const;
-    void set_parent(Node *parent_ptr );
+    inline Node * parent() const {
+        return _parent;
+    }
+    inline void set_parent(Node *parent_ptr ) {
+        //    assert( nullptr != parent_ptr );
+        _parent = parent_ptr;
+    }
 
-    const Itemset & itemset() const;
-    Itemset & itemset();
+    inline const Itemset & itemset() const {
+        return _itemset;
+    }
+    inline Itemset & itemset() {
+        return _itemset;
+    }
 
-    bool is_erased() const;
-    void set_erased();
+    inline bool is_erased() const {
+        return _is_erased;
+    }
+    inline void set_erased() {
+        _is_erased = true;
+    }
 
-    unsigned int sup() const;
+    unsigned int sup() const {
+        return _sup;
+    }
 
-    bool equal( const Node & r_node) const;
-    bool is_superset_of(const Node r_node) const;
+    inline bool equal( const Node & r_node) const {
+        const auto r_mist = r_node.mistakes( _diffset );
+        const auto mist = mistakes( r_node.diffset() );
+        if (  (r_mist == mist) && ( mist == 0 ) ) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    inline bool is_superset_of(const Node r_node) const {
+        const auto r_mist = r_node.mistakes( _diffset );
+        const auto mist = mistakes( r_node.diffset() );
 
-    const Diffset & diffset() const;
-    unsigned int mistakes(const Diffset & other) const;
+        if ( ( mist > 0 ) && ( r_mist == 0 ) ) {
+            // is superset
+            return true;
+        }
+        else {
+            // isn't superset
+            return false;
+        }
+    }
 
-    int hashkey() const;
-    void setHashkey(const int hashkey);
+    inline const Diffset & diffset() const {
+        return _diffset;
+    }
+    inline unsigned int mistakes(const Diffset & other) const {
+        unsigned int mistake_counter = 0;
+        for ( const auto & tid : other ) {
+            if ( _diffset.cend() == std::find( _diffset.cbegin(), _diffset.cend(), tid ) ) {
+                mistake_counter ++;
+            }
+        }
+        return mistake_counter;
+    }
+
+    int hashkey() const {
+        //        assert( _hash_key_setted );
+        return _hashkey;
+    }
+    void setHashkey(const int hashkey) {
+        //        assert( ! _hash_key_setted );
+        _hashkey = hashkey;
+        _hash_key_setted = true;
+    }
 
 private:
-    void calculate_support();
-    void calculate_hashkey();
+    inline void calculate_support() {
+        //        assert( _sup == 0 ); // A default value of the supp, support recalculation is allowed only once
+        //        assert( _parent != nullptr ); // Parent should be avaible
+        _sup = _parent->sup() - _diffset.size();
+        //    assert( _sup >= 0 ); // Support must be positive
+    }
+    inline void calculate_hashkey() {
+        //        assert( _parent != nullptr );
+        //        assert( !_hash_key_setted );
+        _hashkey = diffset_hash::hash( std::make_pair( _diffset, _parent->hashkey() ) );
+        _hash_key_setted = true;
+    }
 
 private:
     Itemset _itemset;

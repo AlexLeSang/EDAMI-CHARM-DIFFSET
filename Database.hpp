@@ -20,7 +20,7 @@ inline std::ostream & operator << ( std::ostream & os, const Database & database
         std::for_each( itemset.cbegin(), itemset.cend(), [&]( const Item & item ) {
             os << item << ' ';
         } );
-        os << '\n';
+        os << "\n\n";
     } );
     return os;
 }

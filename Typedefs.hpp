@@ -30,4 +30,6 @@ constexpr unsigned int n_of_fields = 22;
 typedef char Item;
 #endif
 
+typedef unsigned int Item;
+
 #endif // TYPEDEFS_HPP

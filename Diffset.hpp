@@ -20,7 +20,7 @@ public:
      * \param diffset_pair first: First: node diffset, Second: parent hashkey
      * \return
      */
-    int operator ()( const std::pair< const Diffset&, int > & diffset_pair ) const
+    inline int operator ()( const std::pair< const Diffset&, int > & diffset_pair ) const
     {
         const auto hash_value = diffset_pair.second - std::accumulate( diffset_pair.first.cbegin(), diffset_pair.first.cend(), 0 );
 //        std::cerr << "diffset_hash: [" << diffset_pair.first << " : " << diffset_pair.second << "] = " << hash_value << std::endl;
@@ -32,7 +32,7 @@ public:
      * \param diffset_pair
      * \return
      */
-    static int hash( const std::pair< const Diffset&, int > & diffset_pair )
+    inline static int hash( const std::pair< const Diffset&, int > & diffset_pair )
     {
         static const diffset_hash hash;
         return hash( diffset_pair );

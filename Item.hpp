@@ -4,13 +4,12 @@
 #include <iostream>
 #include "Typedefs.hpp"
 
-
 /*!
  * \brief The item_hash class
  */
 class item_hash {
 public:
-    std::size_t operator()( const Item & item ) const
+    inline std::size_t operator()( const Item & item ) const
     {
         return std::size_t( item );
     }

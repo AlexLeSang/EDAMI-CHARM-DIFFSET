@@ -12,7 +12,7 @@
  * \brief The DatabaseReader class
  */
 
-template < unsigned int nfields >
+template < unsigned int nfields = 0 >
 class DatabaseReader
 {
 private:
@@ -41,7 +41,7 @@ public:
 //    */
 #else
     // Chess
-//    /*
+    /*
     void operator ()(std::ifstream & data_stream, Database & database) const
     {
         std::string s;
@@ -49,7 +49,7 @@ public:
             std::getline( data_stream, s );
 
             if ( !s.empty() ) {
-                //            std::cerr << "Read string: \n" << s << std::endl;
+//                std::cerr << "Read string: \n" << s << std::endl;
                 std::istringstream stringstream( s );
 
                 Itemset itemset( number_of_fields );
@@ -62,7 +62,47 @@ public:
             }
         }
     }
+    */
+
+
+//    /*
+    inline void operator ()(std::ifstream & data_stream, Database & database) const
+    {
+
+        const char delim = ';';
+
+        std::string s;
+
+        Itemset itemset;
+        Item item;
+        std::string item_stirng;
+
+        while ( ! data_stream.eof() ) {
+            std::getline( data_stream, s );
+
+            if ( !s.empty() ) {
+                std::istringstream stringstream( s );
+                itemset.clear();
+                item_stirng.clear();
+                bool first_skipped = false;
+                while ( std::getline( stringstream, item_stirng, delim ) ) {
+                    if ( ! first_skipped ) {
+                        first_skipped = true;
+                        continue;
+                    }
+                    std::istringstream buff( item_stirng );
+                    buff >> item;
+                    itemset.push_back( item );
+                }
+                database.push_back( itemset );
+            }
+        }
+    }
 //    */
+
+
+
+
 #endif
     /*!
      * \brief read_database
@@ -71,7 +111,7 @@ public:
      */
     static void read_database(std::ifstream & data_stream, Database & database)
     {
-        DatabaseReader reader;
+        static DatabaseReader reader;
         reader( data_stream, database );
     }
 };
