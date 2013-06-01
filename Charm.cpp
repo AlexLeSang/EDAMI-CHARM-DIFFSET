@@ -80,3 +80,81 @@ CSet Charm::charm(const Database &database, const unsigned int min_sup)
     //        std::cerr << "c_set: \n" << c_set << std::endl;
     return c_set;
 }
+
+void Charm::charm_extend(Node &p_tree, CSet &c_set, const unsigned int min_sup) {
+    static unsigned int recursion_level = 0;
+    ++ recursion_level;
+
+    //    std::cerr << "\nrecursion_level = " << recursion_level << std::endl;
+
+    //    std::cerr << "p_tree: " << p_tree << std::endl;
+    //    std::for_each( p_tree.children().cbegin(), p_tree.children().cend(), []( const std::shared_ptr<Node> & val_ref ) { std::cerr << (*val_ref) << std::endl; } );
+
+    for ( auto it = p_tree.children().cbegin(); it != p_tree.children().cend(); ++ it ) {
+        Node & current_child = (*(*it));
+        if ( current_child.is_erased() ) continue;
+        //        std::cerr << "\ncurrent_child = " << current_child << std::endl;
+        for ( auto int_it = it + 1; int_it != p_tree.children().cend(); ++ int_it ) {
+            Node & internal_child = (*(*int_it));
+            if ( internal_child.is_erased() ) continue;
+            //            std::cerr << "\n  internal_child = " << internal_child << std::endl;
+            Itemset X = current_child.itemset();
+            Diffset Y = current_child.diffset();
+
+            itemset_union( X, internal_child );
+            diffset_difference( Y, internal_child );
+
+
+            //            auto union_future = std::async( std::launch::async, itemset_union, std::ref(X), std::cref(internal_child) );
+            //            diffset_difference( Y, internal_child );
+            //            union_future.get();
+            //            const Node test_node( X, Y, &current_child );
+            //            const Node test_node( std::move(X), std::move(Y), &current_child );
+            //            std::cerr << "  test_node = " << test_node << std::endl;
+            const unsigned int sup = current_child.sup() - Y.size();
+            if ( sup >= min_sup ) {
+                if ( current_child.equal( internal_child ) ) {
+                    //                    std::cerr << "   property_1" << std::endl;
+                    //                    std::cerr << "Erase " << internal_child << std::endl;
+                    internal_child.set_erased();
+                    const Itemset replased_itemset = current_child.itemset();
+                    //                    replace_item( current_child, replased_itemset, test_node.itemset() );
+                    replace_item( current_child, replased_itemset, X );
+                }
+                else {
+                    if ( internal_child.is_superset_of( current_child ) ) {
+                        //                        std::cerr << "   property_2" << std::endl;
+                        const Itemset replased_itemset = current_child.itemset();
+                        //                        replace_item( current_child, replased_itemset, test_node.itemset() );
+                        replace_item( current_child, replased_itemset, X );
+                    }
+                    else {
+                        if ( current_child.is_superset_of( internal_child ) ) {
+                            //                            std::cerr << "   property_3" << std::endl;
+                            //                            std::cerr << "Erase " << internal_child << std::endl;
+                            internal_child.set_erased();
+                            //                            current_child.add_child( test_node );
+                            current_child.add_child( std::move(X), std::move(Y) );
+                        }
+                        else {
+                            //                            std::cerr << "   property_4" << std::endl;
+                            //                            current_child.add_child( test_node );
+                            current_child.add_child( std::move(X), std::move(Y) );
+                        }
+                    }
+                }
+            }
+            else{
+                //                std::cerr << "   rejected" << std::endl;
+            }
+        }
+
+        charm_extend( current_child, c_set, min_sup );
+    }
+
+    if ( ! p_tree.itemset().empty() ) {
+        check_subsumption_and_insert( c_set, p_tree );
+    }
+
+    -- recursion_level;
+}
