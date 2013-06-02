@@ -7,6 +7,9 @@
 
 #include "Node.hpp"
 
+#include <future>
+
+
 /*!
  * \brief The Charm class
  */
@@ -17,9 +20,11 @@ public:
 
 private:
     static void charm_extend(Node &p_tree, CSet &c_set, const unsigned int min_sup);
+
     inline static void charm_extend_c(Node p_tree, CSet &c_set, const unsigned int min_sup) {
         Charm::charm_extend( p_tree, c_set, min_sup );
     }
+
     inline static void check_subsumption_and_insert(CSet &c_set, const Node &node) {
         //    std::cerr << "Candidate for insertion : " << node << std::endl; // TODO remvoe debug output
 
@@ -50,18 +55,19 @@ private:
         }
 
     }
+
     inline static void itemset_union(Itemset & X, const Node &Xj) {
         Itemset union_itemset( X.size() + Xj.itemset().size() );
         auto it_union = std::set_union( X.cbegin(), X.cend(), Xj.itemset().cbegin(), Xj.itemset().cend(), union_itemset.begin() );
         union_itemset.resize( it_union - union_itemset.begin() );
         X = std::move(union_itemset);
     }
+
     inline static void diffset_difference(Diffset &Y, const Node & Xj) {
         Diffset result_diffset( Y.size() + Xj.diffset().size() );
-        //        auto it = std::set_difference( Y.cbegin(), Y.cend(), Xj.diffset().cbegin(), Xj.diffset().cend(), result_diffset.begin() );
         auto it = std::set_difference( Xj.diffset().cbegin(), Xj.diffset().cend(), Y.cbegin(), Y.cend(), result_diffset.begin() );
         result_diffset.resize( it - result_diffset.begin() );
-        Y = result_diffset;
+        Y = std::move(result_diffset);
     }
 
     inline static void replace_item(Node & node_ref, const Itemset &itemset, const Itemset &itemset_to) {

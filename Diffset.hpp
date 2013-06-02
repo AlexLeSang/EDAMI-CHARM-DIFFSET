@@ -9,17 +9,10 @@
 typedef unsigned int TID; // Transaction Id
 
 typedef std::vector< TID > Diffset;
-
 typedef std::vector< TID > Tidset;
-
 
 class diffset_hash {
 public:
-    /*!
-     * \brief operator ()
-     * \param diffset_pair first: First: node diffset, Second: parent hashkey
-     * \return
-     */
     inline int operator ()( const std::pair< const Diffset&, int > & diffset_pair ) const
     {
         const auto hash_value = diffset_pair.second - std::accumulate( diffset_pair.first.cbegin(), diffset_pair.first.cend(), 0 );
@@ -27,11 +20,6 @@ public:
         return hash_value;
     }
 
-    /*!
-     * \brief hash
-     * \param diffset_pair
-     * \return
-     */
     inline static int hash( const std::pair< const Diffset&, int > & diffset_pair )
     {
         static const diffset_hash hash;
