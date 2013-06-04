@@ -24,59 +24,13 @@ public:
      * \param data_stream
      * \param database
      */
-//    /* Test database
-#ifdef SIMPLE_TEST
-    void operator ()(std::ifstream & data_stream, Database & database) const
-    {
-        std::string s;
-        while ( ! data_stream.eof() ) {
-            std::getline( data_stream, s );
-            if ( s.size() ) {
-                Itemset itemset( s.size() );
-                std::copy( s.cbegin(), s.cend(), itemset.begin() );
-                database.push_back( itemset );
-            }
-        }
-    }
-//    */
-#else
-    // Chess
-    /*
-    void operator ()(std::ifstream & data_stream, Database & database) const
-    {
-        std::string s;
-        while ( ! data_stream.eof() ) {
-            std::getline( data_stream, s );
-
-            if ( !s.empty() ) {
-//                std::cerr << "Read string: \n" << s << std::endl;
-                std::istringstream stringstream( s );
-
-                Itemset itemset( number_of_fields );
-                for ( unsigned int i = 0; i < number_of_fields; ++ i ) {
-                    stringstream >> itemset[ i ];
-                }
-                //            std::cerr << "Itemset: \n" << itemset << std::endl;
-                //            exit( -1 );
-                database.push_back( itemset );
-            }
-        }
-    }
-    */
-
-
-//    /*
     inline void operator ()(std::ifstream & data_stream, Database & database) const
     {
-
         const char delim = ';';
-
         std::string s;
-
         Itemset itemset;
         Item item;
         std::string item_stirng;
-
         while ( ! data_stream.eof() ) {
             std::getline( data_stream, s );
 
@@ -98,12 +52,7 @@ public:
             }
         }
     }
-//    */
 
-
-
-
-#endif
     /*!
      * \brief read_database
      * \param data_stream
