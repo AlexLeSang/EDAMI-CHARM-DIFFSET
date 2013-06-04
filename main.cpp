@@ -9,16 +9,34 @@
 #include <chrono>
 
 
+
+
 #if !(defined CSET_TEST)
 
 void print_usage();
 
-/*!
- * \brief main
- * \param argc
- * \param argv
- * \return
- */
+///*
+int main () {
+
+    std::vector< char > v1 = { 'a', 'b', 'c', 'd' };
+    std::vector< char > what = { 'a', 'c', 'd' };
+    std::vector< char > by_what = { 'x', 'y', 'z' };
+
+    std::cerr << "v1: "; std::for_each( v1.cbegin(), v1.cend(), []( decltype(v1)::const_reference val_ref ) {
+        std::cerr << val_ref << ' ';
+    } );
+    std::cerr << std::endl;
+
+
+}
+//*/
+
+
+
+
+
+
+/*
 int main( int argc, const char * argv[] )
 {
     if ( argc != 4 ) {
@@ -89,7 +107,7 @@ int main( int argc, const char * argv[] )
     }
     return 0;
 }
-
+*/
 
 #endif
 

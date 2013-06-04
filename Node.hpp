@@ -6,6 +6,8 @@
 
 #include <memory>
 
+#include <mutex>
+
 /*!
  * \brief The Node class
  */
@@ -94,6 +96,11 @@ public:
         } );
     }
     inline void add_child(Itemset && itemset, Diffset && diffset) {
+
+//        static std::mutex m;
+//        std::lock_guard< std::mutex > l( m );
+
+
         std::shared_ptr< Node > node( new Node( itemset, diffset, this ) );
         _children.push_back( node );
         std::sort( _children.begin(), _children.end(), [] ( std::shared_ptr< Node > ch1, std::shared_ptr< Node > ch2 ) {
@@ -143,6 +150,7 @@ public:
             return false;
         }
     }
+
     inline bool is_superset_of(const Node r_node) const {
         const auto r_mist = r_node.mistakes( _diffset );
         const auto mist = mistakes( r_node.diffset() );
@@ -160,13 +168,24 @@ public:
     inline const Diffset & diffset() const {
         return _diffset;
     }
+
     inline unsigned int mistakes(const Diffset & other) const {
+        /*
         unsigned int mistake_counter = 0;
         for ( const auto & tid : other ) {
             if ( _diffset.cend() == std::find( _diffset.cbegin(), _diffset.cend(), tid ) ) {
                 mistake_counter ++;
             }
         }
+        */
+        unsigned int mistake_counter = 0;
+        for ( const auto & tid : other ) {
+            if ( !std::binary_search( _diffset.cbegin(), _diffset.cend(), tid ) ) {
+                mistake_counter ++;
+            }
+        }
+
+
         return mistake_counter;
     }
 

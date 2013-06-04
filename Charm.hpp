@@ -10,6 +10,54 @@
 #include <future>
 
 
+
+template< typename T >
+inline void replace_itemset( T & where, const T & what, const T & by_what )
+{
+    if ( where.size() < what.size() ) return;
+
+
+    if ( what.size() == by_what.size() ) {
+        auto it = by_what.cbegin();
+        std::for_each( what.cbegin(), what.cend(), [&]( typename T::const_reference c_val ) {
+                       std::replace( where.begin(), where.end(), c_val, (*it) );
+                ++ it;
+    } );
+    std::sort( where.begin(), where.end() );
+    return;
+}
+
+if ( what.size() < by_what.size() ) {
+    auto it = by_what.cbegin();
+    std::for_each( what.cbegin(), what.cend(), [&]( typename T::const_reference c_val ) {
+                   std::replace( where.begin(), where.end(), c_val, (*it) );
+            ++ it;
+} );
+const unsigned int dist = by_what.size() - what.size();
+
+const unsigned int old_size = where.size();
+where.resize( old_size + dist );
+std::copy( by_what.cbegin() + dist, by_what.cend(), where.begin() + old_size );
+
+std::sort( where.begin(), where.end() );
+return;
+}
+
+
+if ( what.size() > by_what.size() ) {
+
+
+
+    std::sort( where.begin(), where.end() );
+    return;
+}
+
+
+
+}
+
+
+
 /*!
  * \brief The Charm class
  */

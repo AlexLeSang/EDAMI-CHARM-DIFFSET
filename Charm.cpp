@@ -93,11 +93,15 @@ void Charm::charm_extend(Node &p_tree, CSet &c_set, const unsigned int min_sup) 
     for ( auto it = p_tree.children().cbegin(); it != p_tree.children().cend(); ++ it ) {
         Node & current_child = (*(*it));
         if ( current_child.is_erased() ) continue;
+
         for ( auto int_it = it + 1; int_it != p_tree.children().cend(); ++ int_it ) {
             Node & internal_child = (*(*int_it));
             if ( internal_child.is_erased() ) continue;
-            Itemset X = current_child.itemset();
-            Diffset Y = current_child.diffset();
+
+            static Itemset X;
+            X = current_child.itemset();
+            static Diffset Y;
+            Y = current_child.diffset();
 
             itemset_union( X, internal_child );
             diffset_difference( Y, internal_child );
