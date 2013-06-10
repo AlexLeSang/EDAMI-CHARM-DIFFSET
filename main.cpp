@@ -21,6 +21,7 @@ int main( int argc, const char * argv[] )
     while ( argv_index -- ) {
         argv_vector[ argv_index ] = std::string( argv[ argv_index + 1 ] );
     }
+    /*
     { // WARNING Debug output
         std::cout << "Input args: \n";
         std::for_each ( argv_vector.cbegin(), argv_vector.cend(), []( const std::string & str ) {
@@ -28,6 +29,7 @@ int main( int argc, const char * argv[] )
         } );
         std::cout << std::endl;
     }
+    */
     // Read support
     unsigned int min_sup = 0;
     try {
@@ -46,21 +48,25 @@ int main( int argc, const char * argv[] )
         data_stream.open( database_filename );
         if ( data_stream.is_open() ) {
             DatabaseReader<0>::read_database( data_stream, database );
-            std::cerr << "Database was read" << std::endl;
+//            std::cerr << "Database was read" << std::endl;
         }
         else {
             std::cerr << "Cannot open file: " << database_filename << std::endl;
             print_usage();
             return -1;
         }
-        std::cerr << "Database size: " << database.size() << std::endl;
+//        std::cerr << "Database size: " << database.size() << std::endl;
         //        std::cerr << database << std::endl; // TODO remvoe debug output
     }
 
     auto t1 = std::chrono::high_resolution_clock::now();
     const auto c_set = Charm::charm( database, min_sup );
     auto t2 = std::chrono::high_resolution_clock::now();
-    std::cout << "\nCharm::charm( database, min_sup ) took " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " milliseconds\n\n";
+    std::cout << "CHARM Diffset took\n"
+              << std::chrono::duration_cast<std::chrono::hours>(t2 - t1).count() << " h\n"
+              << std::chrono::duration_cast<std::chrono::minutes>(t2 - t1).count() << " ms\n"
+              << std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count() << " sec\n"
+              << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " msec\n";
     std::cout << "Number of frequent itemsets: " << c_set.size() << std::endl;
     //    std::cout << "c_set = " << c_set << std::endl; // TODO remvoe debug output
     // Save results
@@ -70,7 +76,7 @@ int main( int argc, const char * argv[] )
         c_set_stream.open( result_filename );
         if ( c_set_stream.is_open() ) {
             ResultSaver::save(  c_set_stream, c_set );
-            std::cout << "Results was saved" << std::endl;
+//            std::cout << "Results was saved" << std::endl;
         }
         else {
             std::cerr << "Cannot open file: " << result_filename << std::endl;

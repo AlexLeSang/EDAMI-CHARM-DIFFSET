@@ -31,7 +31,4 @@ HEADERS += \
     Database.hpp \
     Diffset.hpp
 
-#DEFINES += "TREE_TEST"
-#DEFINES += "CSET_TEST"
-#DEFINES += "SIMPLE_TEST"
-QMAKE_CXX = g++-4.7
+#QMAKE_CXX = g++-4.7

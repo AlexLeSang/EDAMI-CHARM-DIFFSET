@@ -56,7 +56,7 @@ public:
             ++ transaction_counter;
         } );
         --transaction_counter;
-        std::cerr << "transaction_counter = " << transaction_counter << std::endl;
+//        std::cerr << "transaction_counter = " << transaction_counter << std::endl;
 
         // Translate tidset into diffset
         std::for_each( item_map.begin(), item_map.end(), [&]( ItemMap::reference key_value ) {
@@ -70,7 +70,7 @@ public:
         } );
 
         // Fill the tree
-        const unsigned int sum_of_trans_id = transaction_counter * (transaction_counter - 1) / 2;
+        const int sum_of_trans_id = transaction_counter * (transaction_counter - 1) / 2;
         Node root_node( Itemset(), Diffset(), transaction_counter, sum_of_trans_id );
         //    Tree p( root_node );
         {
@@ -84,11 +84,7 @@ public:
             } );
         }
         auto c_set = CSet();
-        auto t1 = std::chrono::high_resolution_clock::now();
         charm_extend( root_node, c_set, min_sup );
-        auto t2 = std::chrono::high_resolution_clock::now();
-        std::cout << "\ncharm_extend( root_node, c_set, min_sup ) took " << std::chrono::duration_cast<std::chrono::minutes>(t2 - t1).count() << " milliseconds\n";
-
         return c_set;
     }
 

@@ -69,7 +69,7 @@ public:
      * \param sup
      * \param hash
      */
-    Node(const Itemset & itemset, const Diffset & diffset, const unsigned int sup, const unsigned int hash) :
+    Node(const Itemset & itemset, const Diffset & diffset, const unsigned int sup, const int hash) :
         _itemset( itemset ),
         _diffset( diffset ),
         _parent( nullptr ),
