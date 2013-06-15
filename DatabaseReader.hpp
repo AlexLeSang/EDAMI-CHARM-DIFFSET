@@ -33,7 +33,6 @@ public:
         std::string item_stirng;
         while ( ! data_stream.eof() ) {
             std::getline( data_stream, s );
-
             if ( !s.empty() ) {
                 std::istringstream stringstream( s );
                 itemset.clear();

@@ -56,7 +56,7 @@ public:
             ++ transaction_counter;
         } );
         --transaction_counter;
-//        std::cerr << "transaction_counter = " << transaction_counter << std::endl;
+        //        std::cerr << "transaction_counter = " << transaction_counter << std::endl;
 
         // Translate tidset into diffset
         std::for_each( item_map.begin(), item_map.end(), [&]( ItemMap::reference key_value ) {
@@ -70,9 +70,8 @@ public:
         } );
 
         // Fill the tree
-        const int sum_of_trans_id = transaction_counter * (transaction_counter - 1) / 2;
+        const long sum_of_trans_id = transaction_counter * (transaction_counter - 1) / 2;
         Node root_node( Itemset(), Diffset(), transaction_counter, sum_of_trans_id );
-        //    Tree p( root_node );
         {
             std::for_each( item_map.cbegin(), item_map.cend(), [&]( ItemMap::const_reference key_value ) {
                 if ( min_sup <= (transaction_counter - key_value.second.size()) ) {
@@ -116,17 +115,6 @@ private:
     }
 
     /*!
-     * \brief charm_extend_c
-     * \param p_tree
-     * \param c_set
-     * \param min_sup
-     */
-    inline static void charm_extend_c(Node p_tree, CSet &c_set, const unsigned int min_sup)
-    {
-        Charm::charm_extend( p_tree, c_set, min_sup );
-    }
-
-    /*!
      * \brief check_subsumption_and_insert
      * \param c_set
      * \param node
@@ -135,22 +123,57 @@ private:
     {
         const Itemset & X = node.itemset();
         const Diffset & Y = node.diffset();
+
+        /*
+        if ( (X.at(0) == 17) && (X.size() > 1 ) && (X.at(1) == 46) )
+        {
+            const int hashkey = diffset_hash::hash( std::make_pair( Y, node.parent()->hashkey() ) );
+            std::cout << "Check sumsumption of: " << X << " hashkey: " << hashkey << std::endl;
+        }
+        */
+
+
         bool is_subsumed = false;
-        const int hashkey = diffset_hash::hash( std::make_pair( Y, node.parent()->hashkey() ) );
-        const auto range = c_set.equal_range( std::make_pair( Y, hashkey ) );
+        const auto range = c_set.equal_range( std::make_pair( Y, node.parent()->hashkey() ) );
         for ( auto it = range.first; it != range.second; ++ it ) {
             const Itemset & C = (*it).second.first;
             const auto sup = (*it).second.second;
             if ( node.sup() == sup ) {
+
+                /*
+                if ( (X.at(0) == 17) && (X.size() > 1 ) && (X.at(1) == 46) )
+                {
+                    std::cout << "C: " << C << std::endl;
+                }
+                */
+
                 const bool includes = std::includes( C.cbegin(), C.cend(), X.cbegin(), X.cend() );
                 if ( includes ) {
+                    //                    std::cout << "Itemset: " << X << " is subsumed by: " << C << std::endl;
                     is_subsumed = true;
                     break;
                 }
             }
         }
         if ( ! is_subsumed ) {
+
+            static int insertion_count = 0;
+            /*
+            if ( (node.itemset().at(0) == 17) && (node.itemset().size() > 1 ) && (node.itemset().at(1) == 46) )
+            {
+                const auto hashkey = diffset_hash::hash( std::make_pair( node.itemset(), node.parent()->hashkey() ) );
+                std::cout << "Inserted itemset: " << node.itemset() << " with hashkey: " << hashkey << " at: " << insertion_count << std::endl;
+            }
+
+            if ( (node.itemset().size() > 2 ) && (node.itemset().at(0) == 17) && (node.itemset().at(1) == 19) && (node.itemset().at(2) == 46) )
+            {
+                const auto hashkey = diffset_hash::hash( std::make_pair( node.itemset(), node.parent()->hashkey() ) );
+                std::cout << "Inserted itemset: " << node.itemset() << " with hashkey: " << hashkey << " at: " << insertion_count << std::endl;
+            }
+            */
+
             c_set.insert( CSet::value_type( cset_key_t( node.diffset(), node.parent()->hashkey() ), cset_val_t( node.itemset(), node.sup() ) ) );
+            ++ insertion_count;
         }
     }
 
@@ -188,6 +211,7 @@ private:
      */
     inline static void replace_item(Node & node_ref, const Itemset &itemset, const Itemset &itemset_to)
     {
+        //        std::cout << "Replace: " << itemset << " to " << itemset_to << std::endl;
         if ( node_ref.itemset().size() >= itemset.size() ) {
             if ( ! std::includes( node_ref.itemset().cbegin(), node_ref.itemset().cend(), itemset_to.cbegin(), itemset_to.cend() ) ) {
                 // Look for all items

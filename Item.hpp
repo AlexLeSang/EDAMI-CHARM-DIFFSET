@@ -9,9 +9,9 @@
  */
 class item_hash {
 public:
-    inline std::size_t operator()( const Item & item ) const
+    inline int operator()( const Item & item ) const
     {
-        return std::size_t( item );
+        return (int)( item );
     }
 };
 #endif // ITEM_HPP

@@ -220,7 +220,7 @@ public:
      * \brief sup
      * \return
      */
-    unsigned int sup() const
+    int sup() const
     {
         return _sup;
     }

@@ -9,6 +9,7 @@
 #include <tuple>
 #include <utility>
 
+
 /*!
  * \brief cset_key_t
  */
@@ -17,7 +18,7 @@ typedef std::pair< Diffset, int > cset_key_t; // Diffset, parent hashkey
 /*!
  * \brief cset_val_t
  */
-typedef std::pair< Itemset, unsigned int > cset_val_t; // Itemset, support
+typedef std::pair< Itemset, int > cset_val_t; // Itemset, support
 
 /*!
  * \brief CSet

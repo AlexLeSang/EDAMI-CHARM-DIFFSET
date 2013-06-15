@@ -64,7 +64,7 @@ int main( int argc, const char * argv[] )
     auto t2 = std::chrono::high_resolution_clock::now();
     std::cout << "CHARM Diffset took\n"
               << std::chrono::duration_cast<std::chrono::hours>(t2 - t1).count() << " h\n"
-              << std::chrono::duration_cast<std::chrono::minutes>(t2 - t1).count() << " ms\n"
+              << std::chrono::duration_cast<std::chrono::minutes>(t2 - t1).count() << " m\n"
               << std::chrono::duration_cast<std::chrono::seconds>(t2 - t1).count() << " sec\n"
               << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " msec\n";
     std::cout << "Number of frequent itemsets: " << c_set.size() << std::endl;
